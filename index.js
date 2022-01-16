@@ -12,7 +12,7 @@ const program = require('commander');
 const config = require('./config');
 const log4js = require('./log/config');
 
-axios.defaults.baseURL = config.host;
+axios.defaults.baseURL = config.url;
 axios.defaults.headers.Cookie = config.Cookie;
 
 // TODO 支持单个项目的备份与导入
