@@ -25,7 +25,7 @@ program
         if (actionType === 'setup') {
             setup();
         }
-	})
+    })
     .parse(process.argv);
 
 function backupGroup() {
