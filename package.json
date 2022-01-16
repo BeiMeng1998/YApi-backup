@@ -1,0 +1,23 @@
+{
+  "name": "yapi-backup",
+  "version": "0.0.1",
+  "description": "Yapi备份脚本",
+  "main": "index.js",
+  "scripts": {
+    "backup": "node index.js backup",
+    "setup": "node index.js setup"
+  },
+  "keywords": [
+    "Yapi",
+    "backup",
+    "node"
+  ],
+  "author": "Beimeng1998",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "commander": "^8.3.0",
+    "lodash": "^4.17.21",
+    "log4js": "^6.3.0"
+  }
+}
