@@ -92,10 +92,13 @@ function setup() {
             log4js.error('apis文件夹读取失败！');
             return;
         }
-        const filesObj = _.map(files, item => ({
-            name: item.replace('.json', ''),
-            path: path.resolve(__dirname, `apis/${item}`),
-        }));
+        const filesObj = _.map(
+            _.filter(files, item => item !== '.gitignore'),
+            item => ({
+                name: item.replace('.json', ''),
+                path: path.resolve(__dirname, `apis/${item}`),
+            })
+        );
         _.forEach(filesObj, item => {
             const project = {...item};
             const Apidata = require(project.path);
