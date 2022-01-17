@@ -4,7 +4,7 @@
 
 // TODO 请填写配置项
 module.exports = {
-    // Yapi部署url 例：https://yapi.baidu-int.com
+    // YApi部署url 例：https://yapi.baidu-int.com
     url: 'https://yapi.baidu-int.com',
 
     // YApi Cookie
