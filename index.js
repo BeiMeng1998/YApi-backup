@@ -187,7 +187,7 @@ function addCats(project) {
             log4js.info(`${name}目录导入失败，尝试重新导入...`);
             addCat(item, index);
         });
-    }
+    };
     const promiseArr = _.map(cats, (item, index) => (
         addCat(item, index)
     ));
