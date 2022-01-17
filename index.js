@@ -54,18 +54,19 @@ function backupGroup() {
 }
 
 function downAndWrite(project, lengthObj) {
-    log4js.info(`开始下载${project.name}...`);
+    const {name, pid} = project;
+    log4js.info(`开始下载${name}...`);
     new axios({
         method: 'get',
-        url: `/api/plugin/export?type=json&pid=${project.pid}&status=${config.status}&isWiki=false`,
+        url: `/api/plugin/export?type=json&pid=${pid}&status=${config.status}&isWiki=false`,
         responseType: 'stream'
     })
     .then(streamResponse => {
-        log4js.info(`${project.name}下载完成！`);
-        log4js.info(`开始备份${project.name}...`);
-        const writer = fs.createWriteStream(path.resolve(__dirname, `apis/${project.name}-备份.json`));
+        log4js.info(`${name}下载完成！`);
+        log4js.info(`开始备份${name}...`);
+        const writer = fs.createWriteStream(path.resolve(__dirname, `apis/${name}-备份.json`));
         writer.on('close', () => {
-            log4js.info(`${project.name}备份完成！`);
+            log4js.info(`${name}备份完成！`);
             log4js.info(`剩余${--lengthObj.length}个项目...`);
             if (!lengthObj.length) {
                 log4js.info(`全部备份完成！`);
@@ -73,14 +74,14 @@ function downAndWrite(project, lengthObj) {
         });
         writer.on('error', err => {
             log4js.error(err);
-            log4js.info(`${project.name}备份失败，尝试重新备份...`);
+            log4js.info(`${name}备份失败，尝试重新备份...`);
             streamResponse.data.pipe(writer);
         });
         streamResponse.data.pipe(writer);
     })
     .catch(err => {
         log4js.error(err);
-        log4js.info(`${project.name}下载失败，尝试重新下载...`);
+        log4js.info(`${name}下载失败，尝试重新下载...`);
         downAndWrite(project, lengthObj);
     });
 }
@@ -122,16 +123,17 @@ function setup() {
 }
 
 function addNewProject(project) {
-    log4js.info(`开始新增项目：${project.name}...`);
+    const {name} = project;
+    log4js.info(`开始新增项目：${name}...`);
     axios.post('/api/project/add', {
         color: 'pink',
         group_id: config.groupId,
         icon: 'code-o',
-        name: project.name,
+        name,
         project_type: 'private',
     })
     .then(response => {
-        log4js.info(`新增项目${project.name}成功！`);
+        log4js.info(`新增项目${name}成功！`);
         project.projectId = _.get(response, 'data.data._id');
         const payload = {
             apis: project.paths,
@@ -144,11 +146,11 @@ function addNewProject(project) {
         return axios.post('/api/log/list_by_update', payload);
     })
     .then(() => {
-        log4js.info(`开始导入${project.name}目录...`);
+        log4js.info(`开始导入${name}目录...`);
         return addCats(project);
     })
     .then(() => {
-        log4js.info(`开始导入${project.name}接口...`);
+        log4js.info(`开始导入${name}接口...`);
         return savePaths(project);
     })
     .catch(err => {
@@ -184,7 +186,7 @@ function addCats(project) {
             log4js.error(err);
             log4js.info(`${name}目录导入失败，尝试重新导入...`);
             addCat(item, index);
-        })
+        });
     }
     const promiseArr = _.map(cats, (item, index) => (
         addCat(item, index)
@@ -208,7 +210,7 @@ function savePaths(project) {
             log4js.error(err);
             log4js.info(`${name}接口导入失败，尝试重新导入...`);
             savePath(item);
-        })
+        });
     };
     // 低并发选择
     return new Promise(async (resolve, reject) => {
@@ -217,10 +219,5 @@ function savePaths(project) {
             await savePath(item);
         }
         resolve();
-    })
-    // 高并发选择
-    const promiseArr = _.map(savePaths, item => (
-        savePath(item)
-    ));
-    return Promise.allSettled(promiseArr);
+    });
 }
